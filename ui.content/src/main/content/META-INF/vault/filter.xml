@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+    <filter root="/conf/criticalmass" mode="merge"/>
+    <filter root="/content/criticalmass" mode="merge"/>
+    <filter root="/content/dam/criticalmass" mode="merge">
+        <exclude pattern="/content/dam/criticalmass(/.*)?"/>
+        <include pattern="/content/dam/criticalmass/jcr:content(/.*)?"/>
+    </filter>
+    <filter root="/content/dam/criticalmass/asset.jpg" mode="merge"/>
+    <filter root="/content/experience-fragments/criticalmass" mode="merge"/>
+</workspaceFilter>

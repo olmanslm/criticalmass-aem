@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+    <filter root="/apps/criticalmass/clientlibs"/>
+    <filter root="/apps/criticalmass/components"/>
+    <filter root="/apps/criticalmass/i18n"/>
+    <filter root="/apps/sling" />
+    <filter root="/apps/msm/criticalmass_blueprint" mode="merge"/>
+</workspaceFilter>
