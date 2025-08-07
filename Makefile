@@ -1,20 +1,21 @@
 SHELL := /bin/bash
-AUTHOR_PATH := /Users/olmans/_/AEM/6.6/author
-PUBLISH_PATH := /Users/olmans/_/AEM/6.6/publish
+AUTHOR_PATH := /Users/olmans/projects/TDP/AEM/author/6.6/
+PUBLISH_PATH := /Users/olmans/projects/TDP/AEM/publish/6.6/
 AUTHOR_JAR := cq-quickstart-6.6.0.jar
 PUBLISH_JAR := cq-quickstart-6.6.0.jar
 
-JAVA_OPTS_AUTHOR := -Xmx2048m -Xms2048m -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8765 -Djdk.tls.maxCertificateChainLength=15 -Dsling.run.modes=author,local,crx3,crx3tar
-JAVA_OPTS_PUBLISH := -Xmx1536m -Xms1536m -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8766 -Dsling.run.modes=publish,local,development
+
+JAVA_OPTS_AUTHOR := -Xmx2048m -Xms2048m -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8765 -Dsling.run.modes=author,local,crx3,crx3tar,tdp
+JAVA_OPTS_PUBLISH := -Xmx1536m -Xms1536m -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8766 -Dsling.run.modes=publish,local,development,tdp
 
 maven:
 	mvn clean install
 
 maven-notest:
-	mvn clean install -DskipTests=true -Dmaven.wagon.http.ssl.insecure=true
+	mvn clean install -DskipTests=true
 
 author:
-	mvn clean install -PautoInstallPackage
+	mvn clean install -U -PautoInstallPackage 
 
 publish:
 	mvn clean install -PautoInstallPackagePublish
