@@ -24,14 +24,10 @@ import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.models.annotations.Default;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.annotations.injectorspecific.InjectionStrategy;
-import org.apache.sling.models.annotations.injectorspecific.OSGiService;
 import org.apache.sling.models.annotations.injectorspecific.SlingObject;
 import org.apache.sling.models.annotations.injectorspecific.ValueMapValue;
-
-import com.day.cq.wcm.api.Page;
-import com.day.cq.wcm.api.PageManager;
-
-import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Model(adaptables = Resource.class)
 public class HelloWorldModel {
@@ -47,16 +43,17 @@ public class HelloWorldModel {
 
     private String message;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HelloWorldModel.class);
+    
     @PostConstruct
     protected void init() {
-        PageManager pageManager = resourceResolver.adaptTo(PageManager.class);
-        String currentPagePath = Optional.ofNullable(pageManager)
-                .map(pm -> pm.getContainingPage(currentResource))
-                .map(Page::getPath).orElse("");
+        String currentPagePath = currentResource != null ? currentResource.getPath() : "";
 
         message = "Hello World!\n"
             + "Resource type is: " + resourceType + "\n"
-            + "Current page is:  " + currentPagePath + "\n";
+            + "Current resource path is:  " + currentPagePath + "\n";
+
+        LOGGER.debug("Initialized HelloWorldModel with message: {}", message);
     }
 
     public String getMessage() {
