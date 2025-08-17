@@ -27,9 +27,9 @@ import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.annotations.injectorspecific.InjectionStrategy;
 import org.apache.sling.models.annotations.injectorspecific.SlingObject;
 import org.apache.sling.models.annotations.injectorspecific.ValueMapValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Model(adaptables = Resource.class)
 public class HelloWorldModel {
 
@@ -44,7 +44,7 @@ public class HelloWorldModel {
 
     private String message;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HelloWorldModel.class);
+    // Lombok @Slf4j provides static log instance
 
     @PostConstruct
     protected void init() {
@@ -54,7 +54,7 @@ public class HelloWorldModel {
             + "Resource type is: " + resourceType + "\n"
             + "Current resource path is:  " + currentPagePath + "\n";
 
-        LOGGER.debug("Initialized HelloWorldModel with message: {}", message);
+    log.debug("Initialized HelloWorldModel with message: {}", message);
     }
 
     public String getMessage() {

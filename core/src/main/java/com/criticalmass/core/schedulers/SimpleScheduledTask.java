@@ -21,14 +21,14 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A simple demo for cron-job like tasks that get executed regularly.
  * It also demonstrates how property values can be set. Users can
  * set the property values in /system/console/configMgr
  */
+@Slf4j
 @Designate(ocd = SimpleScheduledTask.Config.class)
 @Component(service = Runnable.class)
 public class SimpleScheduledTask implements Runnable {
@@ -58,7 +58,7 @@ public class SimpleScheduledTask implements Runnable {
         String myParameter() default "";
     }
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    // Lombok @Slf4j provides static log instance
 
     private String myParameter;
 
@@ -67,7 +67,7 @@ public class SimpleScheduledTask implements Runnable {
      */
     @Override
     public void run() {
-        logger.debug("SimpleScheduledTask is now running, myParameter='{}'", myParameter);
+        log.debug("SimpleScheduledTask is now running, myParameter='{}'", myParameter);
     }
 
     /**
