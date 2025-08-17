@@ -39,7 +39,7 @@ bundles:
 	cd core && mvn clean install -PautoInstallBundle -DskipTests=true
 
 checkstyle:
-	mvn checkstyle:check
+	cd core && mvn checkstyle:check
 
 check-java17:
 	@command -v jenv >/dev/null 2>&1 || \
