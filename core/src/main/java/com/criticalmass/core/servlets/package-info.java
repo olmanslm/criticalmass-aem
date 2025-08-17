@@ -1,4 +1,7 @@
-/*
+/**
+ * Servlets for handling HTTP requests in the Critical Mass AEM project.
+ */
+/**
  *  Copyright 2015 Adobe Systems Incorporated
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +17,7 @@
  *  limitations under the License.
  */
 @Version("1.0")
-package com.criticalmass.core.core.servlets;
+package com.criticalmass.core.servlets;
 
 import org.osgi.annotation.versioning.Version;
+

@@ -13,7 +13,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.criticalmass.core.core.schedulers;
+
+package com.criticalmass.core.schedulers;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -28,21 +29,30 @@ import org.slf4j.LoggerFactory;
  * It also demonstrates how property values can be set. Users can
  * set the property values in /system/console/configMgr
  */
-@Designate(ocd=SimpleScheduledTask.Config.class)
-@Component(service=Runnable.class)
+@Designate(ocd = SimpleScheduledTask.Config.class)
+@Component(service = Runnable.class)
 public class SimpleScheduledTask implements Runnable {
 
-    @ObjectClassDefinition(name="A scheduled task",
+    @ObjectClassDefinition(name = "A scheduled task",
                            description = "Simple demo for cron-job like task with properties")
     public static @interface Config {
-
+        /**
+         * Returns the cron-job expression for scheduling.
+         * @return the cron-job expression
+         */
         @AttributeDefinition(name = "Cron-job expression")
         String scheduler_expression() default "*/30 * * * * ?";
-
+        /**
+         * Indicates whether the task should be scheduled concurrently.
+         * @return true if concurrent, false otherwise
+         */
         @AttributeDefinition(name = "Concurrent task",
                              description = "Whether or not to schedule this task concurrently")
         boolean scheduler_concurrent() default false;
-
+        /**
+         * Returns a configurable parameter for the scheduled task.
+         * @return the parameter value
+         */
         @AttributeDefinition(name = "A parameter",
                              description = "Can be configured in /system/console/configMgr")
         String myParameter() default "";
@@ -51,12 +61,19 @@ public class SimpleScheduledTask implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private String myParameter;
-    
+
+    /**
+     * Executes the scheduled task.
+     */
     @Override
     public void run() {
         logger.debug("SimpleScheduledTask is now running, myParameter='{}'", myParameter);
     }
 
+    /**
+     * Called when the component is activated.
+     * @param config the configuration
+     */
     @Activate
     protected void activate(final Config config) {
         myParameter = config.myParameter();

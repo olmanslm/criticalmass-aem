@@ -1,5 +1,5 @@
-/*
- *  Copyright 2015 Adobe Systems Incorporated
+/**
+*  Copyright 2015 Adobe Systems Incorporated
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,7 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+/**
+ * Scheduled tasks for the Critical Mass AEM project.
+ */
 @Version("1.0")
-package com.criticalmass.core.core.listeners;
+package com.criticalmass.core.schedulers;
 
 import org.osgi.annotation.versioning.Version;
+

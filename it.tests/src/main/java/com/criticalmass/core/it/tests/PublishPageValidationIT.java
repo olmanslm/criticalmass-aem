@@ -13,6 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
 package com.criticalmass.core.it.tests;
 
 import com.adobe.cq.testing.client.CQClient;

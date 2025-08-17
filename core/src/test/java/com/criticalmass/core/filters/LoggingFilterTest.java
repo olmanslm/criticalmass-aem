@@ -13,7 +13,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.criticalmass.core.core.filters;
+
+package com.criticalmass.core.filters;
 
 import java.io.IOException;
 import java.util.List;

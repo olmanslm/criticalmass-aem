@@ -13,7 +13,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.criticalmass.core.core.listeners;
+
+package com.criticalmass.core.listeners;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A service to demonstrate how changes in the resource tree
- * can be listened for. 
+ * can be listened for.
  * Please note, that apart from EventHandler services,
  * the immediate flag should not be set on a service.
  */
@@ -39,11 +40,9 @@ public class SimpleResourceListener implements ResourceChangeListener {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public void onChange(List<ResourceChange> changes) {
+    public void onChange(final List<ResourceChange> changes) {
         changes.forEach(change -> {
             logger.debug("Resource event: {} at: {} isExternal", change.getType(), change.getPath(), change.isExternal());
         });
-        
     }
 }
-

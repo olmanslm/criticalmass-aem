@@ -1,4 +1,7 @@
-/*
+/**
+ * Event listeners for the Critical Mass AEM project.
+ */
+/**
  *  Copyright 2015 Adobe Systems Incorporated
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +17,6 @@
  *  limitations under the License.
  */
 @Version("1.0")
-package com.criticalmass.core.core.schedulers;
+package com.criticalmass.core.listeners;
 
 import org.osgi.annotation.versioning.Version;

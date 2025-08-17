@@ -13,7 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+/**
+ * Filters for request/response processing in the Critical Mass AEM project.
+ */
 @Version("1.0")
-package com.criticalmass.core.core.models;
+package com.criticalmass.core.filters;
 
 import org.osgi.annotation.versioning.Version;
