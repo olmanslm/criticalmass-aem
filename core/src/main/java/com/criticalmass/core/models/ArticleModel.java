@@ -22,9 +22,9 @@ import lombok.extern.slf4j.Slf4j;
  * - @Getter (Lombok): Auto-generates getters for fields.
  * - @Slf4j (Lombok): Auto-generates a logger.
  */
-@Model(adaptables = Resource.class)
 @Getter
 @Slf4j
+@Model(adaptables = Resource.class)
 public class ArticleModel {
 
     @ValueMapValue
