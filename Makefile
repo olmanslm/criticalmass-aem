@@ -41,6 +41,9 @@ bundles:
 checkstyle:
 	cd core && mvn checkstyle:check
 
+bundles-test:
+	cd core && mvn test
+
 check-java17:
 	@command -v jenv >/dev/null 2>&1 || \
 	( echo '❌ jenv no está instalado. Por favor, instalalo con:' && \

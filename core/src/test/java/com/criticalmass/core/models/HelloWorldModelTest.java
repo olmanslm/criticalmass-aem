@@ -21,11 +21,13 @@ import org.apache.sling.api.resource.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.day.cq.wcm.api.Page;
 import io.wcm.testing.mock.aem.junit5.AemContext;
 import io.wcm.testing.mock.aem.junit5.AemContextExtension;
+
 import com.criticalmass.core.testcontext.AppAemContext;
+import com.day.cq.wcm.api.Page;
+
+
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,6 +47,9 @@ class HelloWorldModelTest {
 
     @BeforeEach
     public void setup() throws Exception {
+
+        // Register Sling Model
+        context.addModelsForPackage("com.criticalmass.core.models");
 
         // prepare a page with a test resource
         page = context.create().page("/content/mypage");

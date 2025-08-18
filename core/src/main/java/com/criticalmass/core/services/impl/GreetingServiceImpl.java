@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
  * - The 'service' attribute tells OSGi which interface it implements.
  * - @Slf4j is a Lombok annotation that gives us a 'log' instance without writing boilerplate.
  */
-@Component(service = GreetingService.class)
+@Component(service = GreetingServiceImpl.class)
 @Slf4j
 public class GreetingServiceImpl implements GreetingService {
 
