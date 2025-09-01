@@ -13,14 +13,28 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */-->
+
+<!-- Call the template with parameters using @ syntax -->
+<sly data-sly-call="${greet @ name='John Doe', number=420}"></sly>
+
+<!-- HTL template example -->
+<template data-sly-template.greet="${@ name, number}">
+    <h2 class="cmp-helloworld__title">Hello ${name}, your number is ${number}!</h2>
+</template>
+
 <div class="cmp-helloworld" data-cmp-is="helloworld">
-    <h2 class="cmp-helloworld__title">Hello World Component</h2>
+    <sly data-sly-call="${greet @ name='John Doe', number=422}"></sly>
+    <!-- Example from dialog -->
+    <sly data-sly-test="${properties.number}" data-sly-call="${greet @ name='Dialog User', number=properties.number}"></sly>
     <div class="cmp-helloworld__item" data-sly-test="${properties.text}">
         <p class="cmp-helloworld__item-label">Text property:</p>
         <pre class="cmp-helloworld__item-output" data-cmp-hook-helloworld="property">${properties.text}</pre>
     </div>
-    <div class="cmp-helloworld__item" data-sly-use.model="com.criticalmass.core.models.HelloWorldModel" data-sly-test="${model.message}">
+    <sly data-sly-use.model="com.criticalmass.core.models.HelloWorldModel"></sly>
+    <div class="cmp-helloworld__item" data-sly-test="${model.message}">
         <p class="cmp-helloworld__item-label">Model message:</p>
-        <pre class="cmp-helloworld__item-output"data-cmp-hook-helloworld="model">${model.message}</pre>
+        <pre class="cmp-helloworld__item-output" data-cmp-hook-helloworld="model">${model.message}</pre>
+        <p class="cmp-helloworld__item-label">Model message from Greeting service:</p>
+        <pre class="cmp-helloworld__item-output" data-cmp-hook-helloworld="model">${model.greetingService}</pre>
     </div>
 </div>

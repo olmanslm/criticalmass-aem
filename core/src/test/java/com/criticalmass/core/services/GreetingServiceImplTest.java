@@ -9,10 +9,12 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class GreetingServiceImplTest {
 
+    private static final int MAGIC_INTEGER = 42;
+
     @Test
     void testGetMessage() {
         GreetingService service = new GreetingServiceImpl();
-        String message = service.getMessage();
+        String message = service.getMessage("description", MAGIC_INTEGER);
 
         assertNotNull(message, "Message should not be null");
         assertEquals("Hello from AEM Service!", message);

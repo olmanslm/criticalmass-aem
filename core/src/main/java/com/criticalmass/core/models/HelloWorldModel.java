@@ -27,12 +27,20 @@ import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.annotations.injectorspecific.InjectionStrategy;
 import org.apache.sling.models.annotations.injectorspecific.SlingObject;
 import org.apache.sling.models.annotations.injectorspecific.ValueMapValue;
+import org.apache.sling.models.annotations.injectorspecific.OSGiService;
+import com.criticalmass.core.services.GreetingService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Model(adaptables = Resource.class)
+@Model(
+    adaptables = Resource.class,
+    adapters = HelloWorldModel.class,
+    resourceType = "criticalmass/components/helloworld"
+)
 public class HelloWorldModel {
 
+    @OSGiService
+    private GreetingService greetingService;
     @ValueMapValue(name = PROPERTY_RESOURCE_TYPE, injectionStrategy = InjectionStrategy.OPTIONAL)
     @Default(values = "No resourceType")
     protected String resourceType;
@@ -44,7 +52,13 @@ public class HelloWorldModel {
 
     private String message;
 
-    // Lombok @Slf4j provides static log instance
+    @ValueMapValue(name = "name", injectionStrategy = InjectionStrategy.OPTIONAL)
+    @Default(values = "Default from HelloWorldModel")
+    private String name;
+
+    @ValueMapValue(name = "number", injectionStrategy = InjectionStrategy.OPTIONAL)
+    @Default(values = "999")
+    private int number;
 
     @PostConstruct
     protected void init() {
@@ -54,11 +68,30 @@ public class HelloWorldModel {
             + "Resource type is: " + resourceType + "\n"
             + "Current resource path is:  " + currentPagePath + "\n";
 
+        // Example: call GreetingService with dialog values
+        if (greetingService != null) {
+            String greeting = greetingService.getMessage(name, number);
+            message += "GreetingService: " + greeting + "\n";
+        }
+
     log.debug("Initialized HelloWorldModel with message: {}", message);
     }
 
     public String getMessage() {
         return message;
+    }
+
+    // Expose direct call for HTL
+    /**
+     * Returns a greeting message from the GreetingService using the current name and number.
+     *
+     * @return the greeting message, or an empty string if the service is unavailable
+     */
+    public String getGreetingService() {
+        if (greetingService != null) {
+            return greetingService.getMessage(name, number);
+        }
+        return "";
     }
 
 }

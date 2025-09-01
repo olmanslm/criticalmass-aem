@@ -22,12 +22,13 @@ import static org.mockito.Mockito.when;
 class HelloServletTest {
 
     private final AemContext context = new AemContext();
+    private static final int MAGIC_INTEGER = 422;
 
     @BeforeEach
     void setUp() {
         // Mock OSGi service
         GreetingService mockService = mock(GreetingService.class);
-        when(mockService.getMessage()).thenReturn("Mocked Greeting!");
+        when(mockService.getMessage("description", MAGIC_INTEGER)).thenReturn("Mocked Greeting!");
 
         context.registerService(GreetingService.class, mockService);
 

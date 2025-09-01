@@ -57,6 +57,6 @@ public class ArticleModel {
         }
 
         // Call OSGi service
-        this.greetingMessage = greetingService.getMessage();
+        this.greetingMessage = greetingService.getMessage("description", 420);
     }
 }

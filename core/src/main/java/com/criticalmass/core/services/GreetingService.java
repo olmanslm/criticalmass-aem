@@ -5,5 +5,5 @@ package com.criticalmass.core.services;
  * Interfaces are important in OSGi because multiple implementations can exist.
  */
 public interface GreetingService {
-    String getMessage();
+    String getMessage(String name, int number);
 }
