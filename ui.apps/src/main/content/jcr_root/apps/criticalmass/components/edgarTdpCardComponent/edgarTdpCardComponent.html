@@ -1,0 +1,46 @@
+<div data-sly-use.clientLib="${'/libs/granite/sightly/templates/clientlib.html'}">
+    <sly data-sly-call="${clientLib.all @ categories='criticalmass.components.edgarTdpCardComponent'}" />
+</div>
+
+<div class="cmp-edgar-tdp-container" data-sly-test="${wcmmode.edit}">
+    <p style="background-color: red; position: relative; z-index: 10;">Please author ${component.properties.jcr:title} component</p>
+</div>
+
+<!-- HTL template for card -->
+<template data-sly-template.cardTmpl="${@ name, type, text, imageUrl}">
+    <div class="cmp-edgar-tdp__item">
+        <img data-sly-test="${imageUrl}" src="${imageUrl}" alt="${name} - ${type}" class="cmp-edgar-tdp__item-image"/>
+        <h4 data-sly-test="${name}" class="cmp-edgar-tdp__item-name">${name}</h4>
+        <h5 data-sly-test="${type}" class="cmp-edgar-tdp__item-type">${type}</h5>
+        <p data-sly-test="${text}" class="cmp-edgar-tdp__item-text">${text}</p>
+    </div>
+</template>
+
+<div class="cmp-edgar-tdp" data-cmp-is="edgarTdpCardComponent">
+    <h1 class="cmp-edgar-tdp__title">
+        Card Name: ${properties.cardName}
+    </h1>
+
+    <div class="cmp-edgar-tdp__section" data-sly-test="${properties.cardName}">
+        <h2 class="cmp-edgar-tdp__item-label">First found Info (using template):</h2>
+        <sly data-sly-use.edgarModelCards="${'com.criticalmass.core.models.EdgarTdpModel' @ cardName=properties.cardName}">
+            <sly data-sly-list.card="${edgarModelCards.getCardInfo}">
+                <sly data-sly-call="${cardTmpl @ name=card.name, type=card.type, text=card.text, imageUrl=card.imageUrl}"></sly>
+            </sly>
+        </sly>
+    </div>
+
+    <div class="cmp-edgar-tdp__section" data-sly-test="${properties.cardName && properties.enableShowAllResults}">
+        <h2 class="cmp-edgar-tdp__item-label">All found Info:</h2>
+        <sly data-sly-use.edgarModelCards="${'com.criticalmass.core.models.EdgarTdpModel' @ cardName=properties.cardName}">
+            <sly data-sly-list.card="${edgarModelCards.getAllCardMatchesInfo}">
+                <div data-sly-attribute.data-json="${properties.card.toString}" class="cmp-edgar-tdp__item">
+                    <img data-sly-test="${card.imageUrl}" src="${card.imageUrl}" alt="${card.name} - ${card.type}" class="cmp-edgar-tdp__item-image"/>
+                    <h4 data-sly-test="${card.name}" class="cmp-edgar-tdp__item-name">${card.name}</h4>
+                    <h5 data-sly-test="${card.type}" class="cmp-edgar-tdp__item-type">${card.type}</h5>
+                    <p data-sly-test="${card.text}" class="cmp-edgar-tdp__item-text">${card.text}</p>
+                </div>
+            </sly>
+        </sly>
+    </div>
+</div>

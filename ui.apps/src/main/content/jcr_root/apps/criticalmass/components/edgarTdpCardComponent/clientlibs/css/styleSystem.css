@@ -1,0 +1,25 @@
+
+/* Background Color */
+.cmp-edgar-tdp--background-white {
+    background-color: white;
+    color: black;
+}
+
+.cmp-edgar-tdp--background-grey {
+    background-color: #f5f5f5;
+    color: black;
+}
+
+.cmp-edgar-tdp--background-black {
+    background-color: black;
+    color: white;
+}
+
+/* Image Border */
+.cmp-edgar-tdp--border-rounded img {
+    border-radius: 20px;
+}
+
+.cmp-edgar-tdp--border-shadow img {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
