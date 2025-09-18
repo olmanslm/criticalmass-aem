@@ -1,6 +1,6 @@
     {
       "org.apache.sling.commons.log.names": [
-         "com.criticalmass.core.services"
+         "Events.Bundle.org.apache.aries.jmx"
       ],
       "org.apache.sling.commons.log.level": "DEBUG",
       "org.apache.sling.commons.log.file": "logs/my-custom-service-services-osgi.log",

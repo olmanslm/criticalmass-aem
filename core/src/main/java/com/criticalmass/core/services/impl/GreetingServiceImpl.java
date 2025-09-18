@@ -16,9 +16,9 @@ public class GreetingServiceImpl implements GreetingService {
 
     @Override
     public String getMessage(final String name, final int number) {
-        log.debug("Processing started for name: {} and number: {}", name, number);
-        log.info("Business logic running");
-        log.error("Something went wrong!");
+        log.debug("Binh Luong Exercise 1 part 1:  Processing started for name: {} and number: {}", name, number);
+        log.info("Binh Luong Exercise 1 part 1:Business logic running");
+        log.error("Binh Luong Exercise 1 part 1:Something went wrong!");
         return String.format("Hello %s! Your number is %d.", name, number);
     }
 }

@@ -1,0 +1,65 @@
+<sly data-sly-use.model="com.criticalmass.core.models.MyDemoModel"></sly>
+
+<template data-sly-template.greet="${@ name, number}">
+  <h3>Hello ${name}, your number is ${number}!</h3>
+</template>
+<sly data-sly-call="${greet @ name='Demo User', number=123}"></sly>
+
+<div data-sly-test="${properties.text}">
+  <p><strong>Text property:</strong></p>
+  <pre>${properties.text}</pre>
+</div>
+
+<div data-sly-test="${model.message}">
+  <p><strong>Model message:</strong></p>
+  <pre>${model.message}</pre>
+
+  <p><strong>Service call result:</strong></p>
+  <pre>${model.greetingService}</pre>
+</div>
+
+<hr/>
+
+<div class="cm-calc" style="font-family:system-ui, sans-serif; display:grid; gap:8px; max-width:420px;">
+  <label>HST Rate (%)
+    <input type="number" step="0.1" min="0" max="100" class="cm-hst" value="${model.hstRate}"/>
+  </label>
+  <label>Number of Items
+    <input type="number" step="1" min="0" class="cm-count" value="${model.itemCount}"/>
+  </label>
+  <label>Price per Item ($)
+    <input type="number" step="0.01" min="0" class="cm-price" value="${model.pricePerItem}"/>
+  </label>
+  <button type="button" class="cm-pay">Pay</button>
+  <div class="cm-out" aria-live="polite"></div>
+</div>
+
+<script>
+  (function(){
+    function money(n){ return Number(n || 0).toFixed(2); }
+    var wrap  = document.currentScript.previousElementSibling;
+    var pay   = wrap && wrap.querySelector('.cm-pay');
+    if(!pay) return;
+
+    pay.addEventListener('click', function(){
+      var hst   = parseFloat(wrap.querySelector('.cm-hst')?.value || '13');
+      var count = parseInt(wrap.querySelector('.cm-count')?.value || '0', 10);
+      var price = parseFloat(wrap.querySelector('.cm-price')?.value || '0');
+      if(isNaN(hst)) hst = 13;
+      if(isNaN(count)) count = 0;
+      if(isNaN(price)) price = 0;
+
+      var subtotal = count * price;
+      var tax = subtotal * (hst/100);
+      var total = subtotal + tax;
+
+      var out = wrap.querySelector('.cm-out');
+      if(out){
+        out.innerHTML =
+          "<strong>Subtotal:</strong> $" + money(subtotal) +
+          " &nbsp;|&nbsp; <strong>HST (" + money(hst) + "%):</strong> $" + money(tax) +
+          " &nbsp;|&nbsp; <strong>Total:</strong> $" + money(total);
+      }
+    });
+  })();
+</script>
