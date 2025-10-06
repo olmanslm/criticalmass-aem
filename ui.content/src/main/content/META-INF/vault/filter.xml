@@ -8,4 +8,5 @@
     </filter>
     <filter root="/content/dam/criticalmass/asset.jpg" mode="merge"/>
     <filter root="/content/experience-fragments/criticalmass" mode="merge"/>
+    <filter root="/content/criticalmass/us/exercise-01-binh-luong" mode="merge"/>
 </workspaceFilter>
