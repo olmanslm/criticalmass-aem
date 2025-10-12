@@ -1,0 +1,18 @@
+<sly data-sly-call="${greet @ name='Demo User', number=123}"></sly>
+<template data-sly-template.greet="${@ name, number}">
+    <h2>Hello ${name}, your number is ${number}!</h2>
+</template>
+<div>
+    <sly data-sly-test="${properties.text}" data-sly-call="${greet @ name='Dialog User', number=properties.number}"></sly>
+    <div data-sly-test="${properties.text}">
+        <p>Text property:</p>
+        <pre>${properties.text}</pre>
+    </div>
+    <sly data-sly-use.model="com.criticalmass.core.models.MyDemoModel"></sly>
+    <div data-sly-test="${model.message}">
+        <p>Model message:</p>
+        <pre>${model.message}</pre>
+        <p>Service call result:</p>
+        <pre>${model.greetingService}</pre>
+    </div>
+</div>

@@ -1,0 +1,8 @@
+    {
+    "org.apache.sling.commons.log.names": [
+        "com.criticalmass.core.servlets"
+    ],
+    "org.apache.sling.commons.log.level": "DEBUG",
+    "org.apache.sling.commons.log.file": "logs/_cm-probe.log",
+    "org.apache.sling.commons.log.additive": true
+    }

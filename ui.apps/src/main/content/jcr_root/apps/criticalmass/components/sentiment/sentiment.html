@@ -1,0 +1,28 @@
+<sly data-sly-use.model="com.criticalmass.core.models.SentimentModel"></sly>
+
+<!-- empty state -->
+<sly data-sly-test="${!model.hasResult}">
+  <div class="cm-sentiment__empty">
+    <em>Open the dialog, add some text, and I’ll tell you how it feels 😊</em>
+  </div>
+</sly>
+
+<!-- result -->
+<div data-sly-test="${model.hasResult}" class="cm-sentiment__card">
+  <div class="cm-sentiment__emoji" aria-label="${model.label}">${model.emoji}</div>
+  <div class="cm-sentiment__label">
+    <strong>${model.label}</strong> &middot; score ${model.score}
+  </div>
+
+  <blockquote class="cm-sentiment__sample" data-sly-test="${model.text}">
+    ${model.text}
+  </blockquote>
+
+  <div class="cm-sentiment__stats" data-sly-test="${model.showStats}">
+    <ul>
+      <li>Tokens: ${model.tokens}</li>
+      <li>Positive hits: ${model.positiveCount}</li>
+      <li>Negative hits: ${model.negativeCount}</li>
+    </ul>
+  </div>
+</div>
