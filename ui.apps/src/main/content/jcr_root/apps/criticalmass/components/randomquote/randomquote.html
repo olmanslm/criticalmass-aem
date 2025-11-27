@@ -1,0 +1,26 @@
+<sly data-sly-use.model="com.criticalmass.core.models.RandomQuoteModel"></sly>
+
+<template data-sly-template.quoteTemplate="${@ text, author}">
+    <div class="quote-item">
+        <blockquote class="quote-text">${text}</blockquote>
+        <footer class="quote-author">— ${author}</footer>
+    </div>
+</template>
+
+<div class="random-quote" data-cmp-is="randomquote">
+
+    <sly data-sly-test="${properties.text}" data-sly-call="${quoteTemplate @ text=properties.text, author=properties.author}"></sly>
+    
+    <sly data-sly-test="${!properties.text && model.text}" data-sly-call="${quoteTemplate @ text=model.text, author=model.author}"></sly>
+    
+    <sly data-sly-test="${!properties.text && !model.text}" data-sly-call="${quoteTemplate @ text='Innovation distinguishes between a leader and a follower.', author='Steve Jobs'}"></sly>
+    
+    <div data-sly-test="${properties.userQuote}" class="user-quote-section">
+        <h3>Your Quote:</h3>
+        <blockquote class="user-quote">${properties.userQuote}</blockquote>
+    </div>
+    
+    <div class="greeting-service-output">
+        <p><strong>Greeting Service:</strong> ${model.greetingService}</p>
+    </div>
+</div>

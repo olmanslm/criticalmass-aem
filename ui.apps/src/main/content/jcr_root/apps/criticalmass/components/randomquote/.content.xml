@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root
+    xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    xmlns:jcr="http://www.jcp.org/jcr/1.0"
+    jcr:primaryType="cq:Component"
+    jcr:title="Random Quote"
+    componentGroup="Critical Mass Multi-Site Project - Content"
+    sling:resourceSuperType="core/wcm/components/commons/v1/templates"/>

@@ -1,6 +1,6 @@
 SHELL := /bin/bash
-AUTHOR_PATH := /Users/olmans/projects/TDP/AEM/author/6.6/
-PUBLISH_PATH := /Users/olmans/projects/TDP/AEM/publish/6.6/
+AUTHOR_PATH := /Users/ryan.shum/projects/TDP/AEM/author/6.6/
+PUBLISH_PATH := /Users/ryan.shum/projects/TDP/AEM/publish/6.6/
 AUTHOR_JAR := cq-quickstart-6.6.0.jar
 PUBLISH_JAR := cq-quickstart-6.6.0.jar
 
@@ -54,18 +54,27 @@ check-java17:
 	  echo '   jenv add /Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home' && \
 	  exit 1 )
 
+# Original lines using Adobe 17.0.15 jdk
+#aem-start: check-java17
+#	cd $(AUTHOR_PATH) && \
+	jenv local 17 && \
+	java -jar $(JAVA_OPTS_AUTHOR) $(AUTHOR_JAR) -port 4502 -gui
+
+#aem-publish-start: check-java17
+#	cd $(PUBLISH_PATH) && \
+	jenv local 17 && \
+	java -jar $(JAVA_OPTS_PUBLISH) $(PUBLISH_JAR) -port 4503 -gui
+
+# Updated to use specific Java 17.0.17 version
 aem-start: check-java17
 	cd $(AUTHOR_PATH) && \
-	jenv local 17 && \
+	jenv local 17.0.17 && \
 	java -jar $(JAVA_OPTS_AUTHOR) $(AUTHOR_JAR) -port 4502 -gui
 
 aem-publish-start: check-java17
 	cd $(PUBLISH_PATH) && \
-	jenv local 17 && \
+	jenv local 17.0.17 && \
 	java -jar $(JAVA_OPTS_PUBLISH) $(PUBLISH_JAR) -port 4503 -gui
-
-
-
 
 
 # 	mvn -B \
