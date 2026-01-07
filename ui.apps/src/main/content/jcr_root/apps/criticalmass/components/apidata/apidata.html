@@ -1,0 +1,174 @@
+<sly data-sly-use.model="com.criticalmass.core.models.JobListingsModel"></sly>
+
+<div class="job-listings-component">
+    
+    <!-- Error state -->
+    <sly data-sly-test="${model.hasApiError}">
+        <div class="api-error">
+            <p>⚠️ Unable to fetch job listings from API</p>
+        </div>
+    </sly>
+    
+    <!-- Job listings display -->
+    <sly data-sly-test="${model.hasJobs}">
+        <div class="jobs-list">
+            <h3>Job Listings - ${model.searchValue} (${model.jobCount} results)</h3>
+            <div class="jobs-grid">
+                <sly data-sly-list.job="${model.jobs}">
+                    <div class="job-card">
+                        <div class="job-header">
+                            <h4 class="job-title">${job.title}</h4>
+                            <span class="job-type" data-sly-test="${job.jobType}">${job.jobType}</span>
+                        </div>
+                        <div class="job-company">
+                            <strong>${job.companyName}</strong>
+                        </div>
+                        <div class="job-location" data-sly-test="${job.location}">
+                            📍 ${job.location}
+                        </div>
+                        <div class="job-description" data-sly-test="${job.description}">
+                            <p>${job.description @ context='html'}</p>
+                        </div>
+                        <div class="job-actions" data-sly-test="${job.url}">
+                            <a href="${job.url}" target="_blank" class="job-link">View Details</a>
+                        </div>
+                    </div>
+                </sly>
+            </div>
+        </div>
+    </sly>
+    
+    <!-- Empty state -->
+    <sly data-sly-test="${!model.hasApiError && !model.hasJobs}">
+        <div class="empty-state">
+            <p>No job listings found</p>
+            <p>Try configuring the component with different search criteria:</p>
+            <ul>
+                <li>Enter a location (e.g., "San Francisco", "Remote")</li>
+                <li>Enter a company name (e.g., "Google", "Microsoft")</li>
+                <li>Leave both empty to show all available jobs</li>
+            </ul>
+        </div>
+    </sly>
+    
+</div>
+
+<style>
+.job-listings-component {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-family: Arial, sans-serif;
+}
+
+.jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.job-card {
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.2s ease;
+}
+
+.job-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.job-title {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.2em;
+    line-height: 1.3;
+}
+
+.job-type {
+    background: #3498db;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    text-transform: uppercase;
+}
+
+.job-company {
+    color: #e74c3c;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+}
+
+.job-location {
+    color: #7f8c8d;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+}
+
+.job-description {
+    color: #34495e;
+    margin-bottom: 15px;
+    max-height: 100px;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.job-description p {
+    margin: 0;
+    font-size: 0.9em;
+}
+
+.job-actions {
+    border-top: 1px solid #ecf0f1;
+    padding-top: 15px;
+}
+
+.job-link {
+    display: inline-block;
+    background: #27ae60;
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.job-link:hover {
+    background: #219a52;
+}
+
+.api-error {
+    background: #ffebee;
+    border: 1px solid #f44336;
+    padding: 15px;
+    border-radius: 4px;
+    color: #c62828;
+}
+
+.empty-state {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    color: #6c757d;
+}
+
+.empty-state ul {
+    text-align: left;
+    display: inline-block;
+    margin-top: 15px;
+}
+</style>

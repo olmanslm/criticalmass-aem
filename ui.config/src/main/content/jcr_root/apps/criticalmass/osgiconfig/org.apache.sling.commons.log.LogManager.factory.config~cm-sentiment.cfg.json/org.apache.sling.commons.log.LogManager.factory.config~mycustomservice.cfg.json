@@ -1,0 +1,8 @@
+    {
+      "org.apache.sling.commons.log.names": [
+         "com.criticalmass.core.services"
+      ],
+      "org.apache.sling.commons.log.level": "DEBUG",
+      "org.apache.sling.commons.log.file": "logs/my-custom-service-services-osgi.log",
+      "org.apache.sling.commons.log.additiv": "true"
+    }
