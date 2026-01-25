@@ -1,6 +1,6 @@
 SHELL := /bin/bash
-AUTHOR_PATH := /Users/olmans/projects/TDP/AEM/author/6.6/
-PUBLISH_PATH := /Users/olmans/projects/TDP/AEM/publish/6.6/
+AUTHOR_PATH := $(HOME)/projects/TDP/AEM/author/6.6/
+PUBLISH_PATH := $(HOME)/projects/TDP/AEM/publish/6.6/
 AUTHOR_JAR := cq-quickstart-6.6.0.jar
 PUBLISH_JAR := cq-quickstart-6.6.0.jar
 
@@ -39,10 +39,7 @@ bundles:
 	cd core && mvn clean install -PautoInstallBundle -DskipTests=true
 
 checkstyle:
-	cd core && mvn checkstyle:check
-
-bundles-test:
-	cd core && mvn test
+	mvn checkstyle:check
 
 check-java17:
 	@command -v jenv >/dev/null 2>&1 || \
