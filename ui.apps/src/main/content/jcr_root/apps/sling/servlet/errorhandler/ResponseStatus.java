@@ -19,12 +19,25 @@ package apps.sling.servlet.errorhandler;
 import com.adobe.cq.sightly.WCMUsePojo;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletResponse;
 
-public class ResponseStatus extends WCMUsePojo {
+/**
+ * Error handler class that sets the HTTP response status to 404 Not Found.
+ * This class is not designed for extension and should remain final.
+ */
+public final class ResponseStatus extends WCMUsePojo {
 
+    private static final int NOT_FOUND_STATUS = HttpServletResponse.SC_NOT_FOUND;
+
+    /**
+     * Activates the error handler by setting the response status to 404 Not Found
+     * and configuring the content type if not in an include context.
+     *
+     * @throws Exception if an error occurs during activation
+     */
     @Override
     public void activate() throws Exception {
-        getResponse().setStatus(404);
+        getResponse().setStatus(NOT_FOUND_STATUS);
         if (getRequest().getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH) == null) {
             getResponse().setContentType("text/html");
         }
