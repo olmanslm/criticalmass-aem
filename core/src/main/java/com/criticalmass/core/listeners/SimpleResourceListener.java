@@ -40,7 +40,8 @@ public class SimpleResourceListener implements ResourceChangeListener {
     @Override
     public void onChange(final List<ResourceChange> changes) {
         changes.forEach(change -> {
-            log.debug("Resource event: {} at: {} isExternal", change.getType(), change.getPath(), change.isExternal());
+            log.debug("Resource event: {} at: {} isExternal", change.getType(),
+                    change.getPath(), change.isExternal());
         });
     }
 }

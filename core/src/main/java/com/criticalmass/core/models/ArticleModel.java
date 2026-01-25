@@ -27,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @Model(adaptables = Resource.class)
 public class ArticleModel {
 
+    private static final int DEFAULT_GREETING_PARAMETER = 420;
+
     @ValueMapValue
     private String title;
 
@@ -57,6 +59,7 @@ public class ArticleModel {
         }
 
         // Call OSGi service
-        this.greetingMessage = greetingService.getMessage("description", 420);
+        this.greetingMessage = greetingService.getMessage("description",
+                DEFAULT_GREETING_PARAMETER);
     }
 }
