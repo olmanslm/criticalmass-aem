@@ -19,10 +19,11 @@ package com.criticalmass.core.it.tests;
 import com.adobe.cq.testing.client.CQClient;
 import com.adobe.cq.testing.junit.rules.CQAuthorPublishClassRule;
 import com.adobe.cq.testing.junit.rules.CQRule;
-import com.adobe.cq.testing.junit.rules.Page;
 import org.apache.sling.testing.clients.ClientException;
-import org.apache.sling.testing.clients.SlingHttpResponse;
-import org.junit.*;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 
 /**
@@ -34,63 +35,85 @@ import org.junit.*;
  */
 public class GetPageIT {
 
-    // The CQAuthorClassRule represents an author service. The rule will read
-    // the hostname and port of the author service from the system properties
-    // passed to the tests.@ClassRule
+    /** HTTP OK status code. */
+    private static final int HTTP_OK = 200;
 
+    /**
+     * The CQAuthorClassRule represents an author service. The rule will read
+     * the hostname and port of the author service from the system properties
+     * passed to the tests.
+     */
     @ClassRule
-    public static final CQAuthorPublishClassRule cqBaseClassRule = new CQAuthorPublishClassRule();
+    public static final CQAuthorPublishClassRule CQ_BASE_CLASS_RULE =
+            new CQAuthorPublishClassRule();
 
-    // CQRule decorates your test and adds additional functionality on top of
-    // it, like session stickyness, test filtering and identification of the
-    // test on the remote service.
-
+    /**
+     * CQRule decorates your test and adds additional functionality on top of
+     * it, like session stickyness, test filtering and identification of the
+     * test on the remote service.
+     */
     @Rule
-    public CQRule cqBaseRule = new CQRule(cqBaseClassRule.authorRule, cqBaseClassRule.publishRule);
+    public CQRule cqBaseRule = new CQRule(CQ_BASE_CLASS_RULE.authorRule,
+            CQ_BASE_CLASS_RULE.publishRule);
 
-    static CQClient adminAuthor;
+    /** CQClient instance for admin user on author service. */
+    private static CQClient adminAuthor;
 
-    static CQClient adminPublish;
+    /** CQClient instance for admin user on publish service. */
+    private static CQClient adminPublish;
 
-    // Thanks to the CQAuthorClassRule, we can create two CQClient instances
-    // bound to the admin user on both the author and publish service.
-
+    /**
+     * Thanks to the CQAuthorClassRule, we can create two CQClient instances
+     * bound to the admin user on both the author and publish service.
+     *
+     * @throws ClientException if client initialization fails
+     */
     @BeforeClass
     public static void beforeClass() throws ClientException {
-        adminAuthor = cqBaseClassRule.authorRule.getAdminClient(CQClient.class);
-        adminPublish = cqBaseClassRule.publishRule.getAdminClient(CQClient.class);
+        adminAuthor = CQ_BASE_CLASS_RULE.authorRule.getAdminClient(
+                CQClient.class);
+        adminPublish = CQ_BASE_CLASS_RULE.publishRule.getAdminClient(
+                CQClient.class);
     }
 
     /**
-     * Verifies that the homepage exists on author
+     * Verifies that the homepage exists on author.
+     *
+     * @throws ClientException if request fails
      */
     @Test
     public void testHomePageAuthor() throws ClientException {
-        adminAuthor.doGet("/", 200);
+        adminAuthor.doGet("/", HTTP_OK);
     }
 
     /**
-     * Verifies that the sites console exists on author
+     * Verifies that the sites console exists on author.
+     *
+     * @throws ClientException if request fails
      */
     @Test
     public void testSitesAuthor() throws ClientException {
-        adminAuthor.doGet("/sites.html", 200);
+        adminAuthor.doGet("/sites.html", HTTP_OK);
     }
 
     /**
-     * Verifies that the assets console exists on author
+     * Verifies that the assets console exists on author.
+     *
+     * @throws ClientException if request fails
      */
     @Test
     public void testAssetsAuthor() throws ClientException {
-        adminAuthor.doGet("/assets.html", 200);
+        adminAuthor.doGet("/assets.html", HTTP_OK);
     }
 
     /**
-     * Verifies that the projects console exists on author
+     * Verifies that the projects console exists on author.
+     *
+     * @throws ClientException if request fails
      */
     @Test
     public void testProjectsAuthor() throws ClientException {
-        adminAuthor.doGet("/projects.html", 200);
+        adminAuthor.doGet("/projects.html", HTTP_OK);
     }
 
 }

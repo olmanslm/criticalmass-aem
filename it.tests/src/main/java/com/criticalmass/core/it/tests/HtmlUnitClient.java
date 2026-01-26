@@ -40,23 +40,31 @@ import java.util.logging.Logger;
 import static org.junit.Assert.fail;
 
 /**
- * AEM client that maintains a WebClient instance from HTMLUnit framework
+ * AEM client that maintains a WebClient instance from HTMLUnit framework.
  */
 public class HtmlUnitClient extends CQClient {
 
+    /** HTTP OK status code. */
+    private static final int HTTP_OK = 200;
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(HtmlUnitClient.class);
+    /** Logger instance. */
+    private static final org.slf4j.Logger LOG =
+            LoggerFactory.getLogger(HtmlUnitClient.class);
 
+    /** WebClient instance for HTML processing. */
     private final WebClient webClient = new WebClient();
 
-    /** Extracts references to external resources used by the specified page.
+    /**
+     * Extracts references to external resources used by the specified page.
      * This method extracts references from script, img, meta and link tags.
+     *
      * @param path path to the page.
      * @return list of URIs resolved against the pages baseURL
      * @throws IOException when IO error occurs
      * @throws URISyntaxException if malformed URL reference is found.
      */
-    public List<URI> getResourceRefs(String path) throws IOException, URISyntaxException {
+    public List<URI> getResourceRefs(final String path) throws IOException,
+            URISyntaxException {
         HtmlPage page = getPage(path, false);
         List<URI> result = new ArrayList<>();
         result.addAll(getRefs(page, "script", "src"));
@@ -69,12 +77,14 @@ public class HtmlUnitClient extends CQClient {
 
     /**
      * Loads html page specified by path.
+     *
      * @param path path to the page
      * @param javaScriptEnabled whether to execute javascript
      * @return parsed page.
      * @throws IOException if IO error occurs.
      */
-    public HtmlPage getPage(String path, boolean javaScriptEnabled) throws IOException {
+    public HtmlPage getPage(final String path, final boolean javaScriptEnabled)
+            throws IOException {
         WebClientOptions options = webClient.getOptions();
         boolean wasJsEnabled = options.isJavaScriptEnabled();
         try {
@@ -89,16 +99,39 @@ public class HtmlUnitClient extends CQClient {
     // Creation
     //*********************************************
 
-    public HtmlUnitClient(CloseableHttpClient http, SlingClientConfig config) throws ClientException {
+    /**
+     * Constructor with HTTP client and config.
+     *
+     * @param http the HTTP client
+     * @param config the client configuration
+     * @throws ClientException if client initialization fails
+     */
+    public HtmlUnitClient(final CloseableHttpClient http,
+            final SlingClientConfig config) throws ClientException {
         super(http, config);
         webClient.setCredentialsProvider(this.getCredentialsProvider());
     }
 
-    public HtmlUnitClient(URI url, String user, String password) throws ClientException {
+    /**
+     * Constructor with URL, user and password.
+     *
+     * @param url the server URL
+     * @param user the username
+     * @param password the password
+     * @throws ClientException if client initialization fails
+     */
+    public HtmlUnitClient(final URI url, final String user,
+            final String password) throws ClientException {
         super(url, user, password);
         webClient.setCredentialsProvider(this.getCredentialsProvider());
     }
 
+    /**
+     * Closes the client and releases resources.
+     * Subclasses should call super.close() when overriding.
+     *
+     * @throws IOException if an error occurs during close
+     */
     @Override
     public void close() throws IOException {
         try {
@@ -112,7 +145,17 @@ public class HtmlUnitClient extends CQClient {
     // Internals
     //*********************************************
 
-    private static List<URI> getRefs(HtmlPage page, String tag, String refAttr) throws URISyntaxException {
+    /**
+     * Get references from page elements.
+     *
+     * @param page the HTML page
+     * @param tag the tag name to search for
+     * @param refAttr the attribute containing the reference
+     * @return list of URI references
+     * @throws URISyntaxException if URI syntax error occurs
+     */
+    private static List<URI> getRefs(final HtmlPage page, final String tag,
+            final String refAttr) throws URISyntaxException {
         URI baseUri = new URI(page.getBaseURI());
         List<URI> result = new ArrayList<>();
         for (DomNode child : page.getElementsByTagName(tag)) {
@@ -127,29 +170,35 @@ public class HtmlUnitClient extends CQClient {
 
     /**
      * Extract all image core components and their references from the page.
+     *
      * @param page the page to scan
      * @return all renditions of all image core components
-     * @throws URISyntaxException
+     * @throws URISyntaxException if URI syntax error occurs
      */
-    private static List<URI> getCoreComponentImageRenditions (HtmlPage page) throws URISyntaxException {
+    private static List<URI> getCoreComponentImageRenditions(
+            final HtmlPage page) throws URISyntaxException {
         URI baseUri = new URI(page.getBaseURI());
         List<URI> result = new ArrayList<>();
 
         // detect images core components based on the CSS class name
-        List<DomNode> coreComponents = page.getByXPath("//div[contains(@class, 'cmp-image')]");
-        for (DomNode child:  coreComponents) {
+        List<DomNode> coreComponents = page
+                .getByXPath("//div[contains(@class, 'cmp-image')]");
+        for (DomNode child : coreComponents) {
             String src = null;
             String width = null;
             if (child.getAttributes().getNamedItem("data-cmp-src") != null) {
-                src = child.getAttributes().getNamedItem("data-cmp-src").getNodeValue();
+                src = child.getAttributes().getNamedItem("data-cmp-src")
+                        .getNodeValue();
             }
-            if (child.getAttributes().getNamedItem("data-cmp-widths") != null) {
-                width = child.getAttributes().getNamedItem("data-cmp-widths").getNodeValue();
+            if (child.getAttributes().getNamedItem("data-cmp-widths")
+                    != null) {
+                width = child.getAttributes().getNamedItem("data-cmp-widths")
+                        .getNodeValue();
             }
             if (src != null && width != null) {
                 String[] widths = width.split(",");
-                for (String w: widths) {
-                    String ref = src.replace("{.width}", "."+w);
+                for (String w : widths) {
+                    String ref = src.replace("{.width}", "." + w);
                     result.add(baseUri.resolve(ref));
                 }
             } else if (src != null && width == null) {
@@ -163,14 +212,17 @@ public class HtmlUnitClient extends CQClient {
 
 
     /**
-     *  Loads requested page while suppressing CSS errors (logged as warnings)
+     * Loads requested page while suppressing CSS errors (logged as warnings).
+     *
      * @param webClient web client to use for loading
      * @param url page URL
      * @return loaded HtmlPage instance.
      * @throws IOException when error occurs
      */
-    private static HtmlPage getPage(WebClient webClient, URL url) throws IOException {
-        Logger logger = Logger.getLogger(DefaultCssErrorHandler.class.getName());
+    private static HtmlPage getPage(final WebClient webClient,
+            final URL url) throws IOException {
+        Logger logger = Logger.getLogger(DefaultCssErrorHandler.class
+                .getName());
         Level originalLevel = logger.getLevel();
         try {
             logger.setLevel(Level.SEVERE);
@@ -181,14 +233,16 @@ public class HtmlUnitClient extends CQClient {
     }
 
     /**
-     * Extracts URI reference from specified element and converts it to URI
-     * This method will trigger junit assertion if refAttr value cannot be parsed as URI
-     * providing comprehensive error message.
-     * @param node - html element from which to extract reference
-     * @param refAttr - name of the attribute containing corresponding value
-     * @return refAttr value as URI or <code>null</code> if attribute does not exist
+     * Extracts URI reference from specified element and converts it to URI.
+     * This method will trigger junit assertion if refAttr value cannot be
+     * parsed as URI providing comprehensive error message.
+     *
+     * @param node html element from which to extract reference
+     * @param refAttr name of the attribute containing corresponding value
+     * @return refAttr value as URI or null if attribute does not exist
      */
-    private static URI getNamedItemAsUri(DomNode node, String refAttr) {
+    private static URI getNamedItemAsUri(final DomNode node,
+            final String refAttr) {
         Node src = node.getAttributes().getNamedItem(refAttr);
         if (src == null) {
             return null;
@@ -197,10 +251,13 @@ public class HtmlUnitClient extends CQClient {
                 String href = src.getNodeValue();
                 return new URI(href);
             } catch (URISyntaxException e) {
-                fail("Invalid URI value in [" + refAttr + "] attribute in: [" + node + "].\n" +
-                        "   Page URL:  [" + node.getPage().getUrl() + "]\n" +
-                        "   XPath:     [" + node.getCanonicalXPath() + "]\n" +
-                        "   Caused by: [" + e.getMessage() + "]");
+                fail("Invalid URI value in [" + refAttr
+                        + "] attribute in: [" + node + "].\n"
+                        + "   Page URL:  [" + node.getPage().getUrl()
+                        + "]\n"
+                        + "   XPath:     [" + node.getCanonicalXPath()
+                        + "]\n"
+                        + "   Caused by: [" + e.getMessage() + "]");
                 throw new AssertionError(); // must never happen
             }
         }
