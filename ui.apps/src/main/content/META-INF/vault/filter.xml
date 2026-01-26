@@ -3,6 +3,7 @@
     <filter root="/apps/criticalmass/clientlibs"/>
     <filter root="/apps/criticalmass/components"/>
     <filter root="/apps/criticalmass/i18n"/>
+    <filter root="/apps/criticalmass/workflow"/>
     <filter root="/apps/sling" />
     <filter root="/apps/msm/criticalmass_blueprint" mode="merge"/>
 </workspaceFilter>
