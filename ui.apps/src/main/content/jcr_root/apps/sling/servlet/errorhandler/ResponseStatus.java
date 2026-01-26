@@ -27,18 +27,23 @@ import javax.servlet.http.HttpServletResponse;
  */
 public final class ResponseStatus extends WCMUsePojo {
 
-    private static final int NOT_FOUND_STATUS = HttpServletResponse.SC_NOT_FOUND;
+    /**
+     * HTTP status code for Not Found responses.
+     */
+    private static final int NOT_FOUND_STATUS =
+            HttpServletResponse.SC_NOT_FOUND;
 
     /**
-     * Activates the error handler by setting the response status to 404 Not Found
-     * and configuring the content type if not in an include context.
+     * Activates the error handler by setting the response status to 404
+     * Not Found and configuring the content type if not in an include context.
      *
      * @throws Exception if an error occurs during activation
      */
     @Override
     public void activate() throws Exception {
         getResponse().setStatus(NOT_FOUND_STATUS);
-        if (getRequest().getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH) == null) {
+        if (getRequest().getAttribute(
+                RequestDispatcher.INCLUDE_SERVLET_PATH) == null) {
             getResponse().setContentType("text/html");
         }
     }

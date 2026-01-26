@@ -16,6 +16,7 @@
 
 /**
  * Sling servlet error handler components for handling HTTP error responses.
- * This package contains utilities for custom error page handling in AEM/Sling applications.
+ * This package contains utilities for custom error page handling
+ * in AEM/Sling applications.
  */
 package apps.sling.servlet.errorhandler;
