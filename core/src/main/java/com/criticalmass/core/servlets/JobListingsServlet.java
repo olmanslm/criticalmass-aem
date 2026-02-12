@@ -25,7 +25,7 @@ public class JobListingsServlet extends SlingSafeMethodsServlet {
 
     @Reference
     private JobApiService jobApiService;
-    
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -40,7 +40,7 @@ public class JobListingsServlet extends SlingSafeMethodsServlet {
 
         try {
             List<JobListing> jobs;
-            
+
             if (location != null && !location.trim().isEmpty()) {
                 // Return jobs filtered by location
                 jobs = jobApiService.fetchJobsByLocation(location);
@@ -51,12 +51,12 @@ public class JobListingsServlet extends SlingSafeMethodsServlet {
                 // Return all jobs
                 jobs = jobApiService.fetchJobs();
             }
-            
+
             String json = objectMapper.writeValueAsString(jobs);
             response.getWriter().write(json);
-            
+
         } catch (Exception e) {
-            response.setStatus(500);
+            response.setStatus(SlingHttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Internal server error: " + e.getMessage() + "\"}");
         }
     }

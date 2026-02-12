@@ -1,8 +1,0 @@
-{
-  "org.apache.sling.commons.log.names": [
-    "com.criticalmass.core.audit"
-  ],
-  "org.apache.sling.commons.log.level": "DEBUG",
-  "org.apache.sling.commons.log.file": "logs/cm-core-audit.log",
-  "org.apache.sling.commons.log.additive": true
-}

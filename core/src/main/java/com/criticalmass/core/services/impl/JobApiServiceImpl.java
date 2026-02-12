@@ -3,9 +3,9 @@ package com.criticalmass.core.services.impl;
 import com.criticalmass.core.services.JobApiService;
 import com.criticalmass.core.services.dto.ApiResponse;
 import com.criticalmass.core.services.dto.JobListing;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -13,35 +13,100 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.metatype.annotations.Designate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component(service = JobApiService.class)
 @Designate(ocd = JobApiConfiguration.class)
 public class JobApiServiceImpl implements JobApiService {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(JobApiServiceImpl.class);
+    private static final int HTTP_STATUS_SUCCESS_MIN = 200;
+    private static final int HTTP_STATUS_SUCCESS_MAX = 300;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    
-    // Default job API endpoint
-    private static final String DEFAULT_API_BASE_URL = "https://jobs.github.com";
-    
+
+    private volatile String apiBaseUrl;
+    private volatile int connectionTimeout;
+    private volatile int readTimeout;
+
+    @Activate
+    @Modified
+    protected void activate(final JobApiConfiguration configuration) {
+        this.apiBaseUrl = normalizeBaseUrl(configuration.apiBaseUrl());
+        this.connectionTimeout = Math.max(1000, configuration.connectionTimeout());
+        this.readTimeout = Math.max(1000, configuration.readTimeout());
+        LOG.info("Job API service configured with base URL {} (connect timeout {} ms, read timeout {} ms)",
+            this.apiBaseUrl, this.connectionTimeout, this.readTimeout);
+    }
+
+    private String normalizeBaseUrl(final String rawBaseUrl) {
+        String fallback = "https://jobdataapi.com/api/jobs";
+        if (rawBaseUrl == null || rawBaseUrl.trim().isEmpty()) {
+            return fallback;
+        }
+        String normalized = rawBaseUrl.trim();
+        while (normalized.endsWith("/")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+        return normalized.isEmpty() ? fallback : normalized;
+    }
+
+    private String buildJobsUrl(final String location, final String company) {
+        StringBuilder url = new StringBuilder(apiBaseUrl).append("/");
+        boolean hasQuery = false;
+
+        if (location != null && !location.trim().isEmpty()) {
+            url.append("location=").append(URLEncoder.encode(location.trim(), StandardCharsets.UTF_8));
+            hasQuery = true;
+        }
+
+        if (company != null && !company.trim().isEmpty()) {
+            url.append(hasQuery ? "&" : "?")
+                .append("company=")
+                .append(URLEncoder.encode(company.trim(), StandardCharsets.UTF_8));
+        } else if (hasQuery) {
+            // Prefix the first query parameter when only location is set.
+            int queryStart = url.indexOf("location=");
+            if (queryStart > -1) {
+                url.insert(queryStart, "?");
+            }
+        }
+
+        return url.toString();
+    }
+
+    private CloseableHttpClient createHttpClient() {
+        RequestConfig requestConfig = RequestConfig.custom()
+            .setConnectTimeout(connectionTimeout)
+            .setConnectionRequestTimeout(connectionTimeout)
+            .setSocketTimeout(readTimeout)
+            .build();
+
+        return HttpClients.custom()
+            .setDefaultRequestConfig(requestConfig)
+            .build();
+    }
+
     @Override
-    public ApiResponse get(String url) {
-        try (CloseableHttpClient client = HttpClients.createDefault()) {
+    public ApiResponse get(final String url) {
+        try (CloseableHttpClient client = createHttpClient()) {
             HttpGet request = new HttpGet(url);
             request.setHeader("Content-Type", "application/json");
-            
+
             try (CloseableHttpResponse response = client.execute(request)) {
                 String responseBody = EntityUtils.toString(response.getEntity());
                 int statusCode = response.getStatusLine().getStatusCode();
-                
-                if (statusCode >= 200 && statusCode < 300) {
+
+                if (statusCode >= HTTP_STATUS_SUCCESS_MIN && statusCode < HTTP_STATUS_SUCCESS_MAX) {
                     return ApiResponse.builder()
                         .success(true)
                         .data(responseBody)
@@ -64,19 +129,19 @@ public class JobApiServiceImpl implements JobApiService {
                 .build();
         }
     }
-    
+
     @Override
-    public ApiResponse post(String url, String jsonPayload) {
-        try (CloseableHttpClient client = HttpClients.createDefault()) {
+    public ApiResponse post(final String url, final String jsonPayload) {
+        try (CloseableHttpClient client = createHttpClient()) {
             HttpPost request = new HttpPost(url);
             request.setHeader("Content-Type", "application/json");
             request.setEntity(new StringEntity(jsonPayload));
-            
+
             try (CloseableHttpResponse response = client.execute(request)) {
                 String responseBody = EntityUtils.toString(response.getEntity());
                 int statusCode = response.getStatusLine().getStatusCode();
-                
-                if (statusCode >= 200 && statusCode < 300) {
+
+                if (statusCode >= HTTP_STATUS_SUCCESS_MIN && statusCode < HTTP_STATUS_SUCCESS_MAX) {
                     return ApiResponse.builder()
                         .success(true)
                         .data(responseBody)
@@ -98,49 +163,23 @@ public class JobApiServiceImpl implements JobApiService {
                 .build();
         }
     }
-    
+
     @Override
     public List<JobListing> fetchJobs() {
-        String url = DEFAULT_API_BASE_URL + "/positions.json";
-        ApiResponse response = get(url);
-        
+        ApiResponse response = get(buildJobsUrl(null, null));
+
         if (response.isSuccess()) {
             try {
-                JsonNode jsonNode = objectMapper.readTree(response.getData().toString());
-                List<JobListing> jobs = new ArrayList<>();
-                
-                // API returns results array
-                JsonNode resultsArray = jsonNode.isArray() ? jsonNode : jsonNode.get("results");
-                if (resultsArray == null) {
+                JsonNode jsonNode = objectMapper.readTree(String.valueOf(response.getData()));
+                JsonNode resultsArray = jsonNode.path("results");
+                if (!resultsArray.isArray() && jsonNode.isArray()) {
                     resultsArray = jsonNode;
                 }
-                
+
+                List<JobListing> jobs = new ArrayList<>();
                 for (JsonNode jobNode : resultsArray) {
-                    // Extract company information
-                    JsonNode companyNode = jobNode.path("company");
-                    String companyName = companyNode.path("name").asText();
-                    String linkedInUrl = companyNode.path("linkedin_url").asText();
-                    
-                    // Extract job type from types array
-                    String jobType = "";
-                    JsonNode typesNode = jobNode.path("types");
-                    if (typesNode.isArray() && typesNode.size() > 0) {
-                        jobType = typesNode.get(0).path("name").asText();
-                    }
-                    
-                    JobListing job = JobListing.builder()
-                        .id(jobNode.path("id").asText())
-                        .title(jobNode.path("title").asText())
-                        .companyName(companyName)
-                        .companyLinkedInUrl(linkedInUrl)
-                        .location(jobNode.path("location").asText())
-                        .description(jobNode.path("description").asText())
-                        .jobType(jobType)
-                        .url(jobNode.path("url").asText())
-                        .build();
-                    jobs.add(job);
+                    jobs.add(toJobListing(jobNode));
                 }
-                
                 LOG.info("Successfully fetched {} jobs", jobs.size());
                 return jobs;
             } catch (Exception e) {
@@ -148,52 +187,32 @@ public class JobApiServiceImpl implements JobApiService {
                 return new ArrayList<>();
             }
         }
-        
+
         LOG.warn("Failed to fetch jobs: {}", response.getErrorMessage());
         return new ArrayList<>();
     }
-    
+
     @Override
-    public List<JobListing> fetchJobsByLocation(String location) {
-        String url = DEFAULT_API_BASE_URL + "/positions.json?location=" + location;
-        ApiResponse response = get(url);
-        
+    public List<JobListing> fetchJobsByLocation(final String location) {
+        ApiResponse response = get(buildJobsUrl(location, null));
+
         if (response.isSuccess()) {
             try {
-                JsonNode jsonNode = objectMapper.readTree(response.getData().toString());
+                JsonNode jsonNode = objectMapper.readTree(String.valueOf(response.getData()));
                 List<JobListing> jobs = new ArrayList<>();
-                
-                JsonNode resultsArray = jsonNode.isArray() ? jsonNode : jsonNode.get("results");
-                if (resultsArray == null) {
+
+                JsonNode resultsArray = jsonNode.path("results");
+                if (!resultsArray.isArray() && jsonNode.isArray()) {
                     resultsArray = jsonNode;
                 }
-                
+
                 for (JsonNode jobNode : resultsArray) {
-                    // Extract company information
-                    JsonNode companyNode = jobNode.path("company");
-                    String companyName = companyNode.path("name").asText();
-                    String linkedInUrl = companyNode.path("linkedin_url").asText();
-                    
-                    // Extract job type from types array
-                    String jobType = "";
-                    JsonNode typesNode = jobNode.path("types");
-                    if (typesNode.isArray() && typesNode.size() > 0) {
-                        jobType = typesNode.get(0).path("name").asText();
+                    JobListing job = toJobListing(jobNode);
+                    if (containsIgnoreCase(job.getLocation(), location)) {
+                        jobs.add(job);
                     }
-                    
-                    JobListing job = JobListing.builder()
-                        .id(jobNode.path("id").asText())
-                        .title(jobNode.path("title").asText())
-                        .companyName(companyName)
-                        .companyLinkedInUrl(linkedInUrl)
-                        .location(jobNode.path("location").asText())
-                        .description(jobNode.path("description").asText())
-                        .jobType(jobType)
-                        .url(jobNode.path("url").asText())
-                        .build();
-                    jobs.add(job);
                 }
-                
+
                 LOG.info("Successfully fetched {} jobs for location: {}", jobs.size(), location);
                 return jobs;
             } catch (Exception e) {
@@ -201,60 +220,32 @@ public class JobApiServiceImpl implements JobApiService {
                 return new ArrayList<>();
             }
         }
-        
+
         LOG.warn("Failed to fetch jobs for location {}: {}", location, response.getErrorMessage());
         return new ArrayList<>();
     }
-    
+
     @Override
-    public List<JobListing> fetchJobsByCompany(String company) {
-        String url = DEFAULT_API_BASE_URL + "/positions.json?company=" + company;
-        ApiResponse response = get(url);
-        
+    public List<JobListing> fetchJobsByCompany(final String company) {
+        ApiResponse response = get(buildJobsUrl(null, company));
+
         if (response.isSuccess()) {
             try {
-                JsonNode jsonNode = objectMapper.readTree(response.getData().toString());
+                JsonNode jsonNode = objectMapper.readTree(String.valueOf(response.getData()));
                 List<JobListing> jobs = new ArrayList<>();
-                
-                JsonNode resultsArray = jsonNode.isArray() ? jsonNode : jsonNode.get("results");
-                if (resultsArray == null) {
+
+                JsonNode resultsArray = jsonNode.path("results");
+                if (!resultsArray.isArray() && jsonNode.isArray()) {
                     resultsArray = jsonNode;
                 }
-                
+
                 for (JsonNode jobNode : resultsArray) {
-                    // Extract company information from nested object
-                    String companyName = "";
-                    String companyLinkedInUrl = "";
-                    JsonNode companyNode = jobNode.path("company");
-                    if (companyNode.isObject()) {
-                        companyName = companyNode.path("name").asText("");
-                        companyLinkedInUrl = companyNode.path("linkedInUrl").asText("");
-                    } else {
-                        companyName = companyNode.asText("");
+                    JobListing job = toJobListing(jobNode);
+                    if (containsIgnoreCase(job.getCompanyName(), company)) {
+                        jobs.add(job);
                     }
-
-                    // Extract job type from types array (get first type)
-                    String jobType = "";
-                    JsonNode typesArray = jobNode.path("types");
-                    if (typesArray.isArray() && typesArray.size() > 0) {
-                        jobType = typesArray.get(0).path("name").asText("");
-                    } else {
-                        jobType = jobNode.path("type").asText("");
-                    }
-
-                    JobListing job = JobListing.builder()
-                        .id(jobNode.path("id").asText())
-                        .title(jobNode.path("title").asText())
-                        .companyName(companyName)
-                        .companyLinkedInUrl(companyLinkedInUrl)
-                        .location(jobNode.path("location").asText())
-                        .description(jobNode.path("description").asText())
-                        .jobType(jobType)
-                        .url(jobNode.path("url").asText())
-                        .build();
-                    jobs.add(job);
                 }
-                
+
                 LOG.info("Successfully fetched {} jobs for company: {}", jobs.size(), company);
                 return jobs;
             } catch (Exception e) {
@@ -262,8 +253,41 @@ public class JobApiServiceImpl implements JobApiService {
                 return new ArrayList<>();
             }
         }
-        
+
         LOG.warn("Failed to fetch jobs for company {}: {}", company, response.getErrorMessage());
         return new ArrayList<>();
+    }
+
+    private JobListing toJobListing(final JsonNode jobNode) {
+        JsonNode companyNode = jobNode.path("company");
+        JsonNode typesArray = jobNode.path("types");
+
+        String jobType = "";
+        if (typesArray.isArray() && typesArray.size() > 0) {
+            jobType = typesArray.get(0).path("name").asText("");
+        }
+
+        String applicationUrl = jobNode.path("application_url").asText("");
+        if (applicationUrl.isEmpty()) {
+            applicationUrl = jobNode.path("url").asText("");
+        }
+
+        return JobListing.builder()
+            .id(jobNode.path("id").asText(""))
+            .title(jobNode.path("title").asText(""))
+            .companyName(companyNode.path("name").asText(""))
+            .companyLinkedInUrl(companyNode.path("linkedin_url").asText(""))
+            .location(jobNode.path("location").asText(""))
+            .description(jobNode.path("description").asText(""))
+            .jobType(jobType)
+            .url(applicationUrl)
+            .build();
+    }
+
+    private boolean containsIgnoreCase(final String source, final String filter) {
+        if (filter == null || filter.trim().isEmpty()) {
+            return true;
+        }
+        return source != null && source.toLowerCase().contains(filter.trim().toLowerCase());
     }
 }

@@ -48,6 +48,7 @@ public class RobertoDemoModel {
             this.greetingServiceMessage = "GreetingService unavailable";
         }
     }
+
     public String getMessage() {
         return message;
     }

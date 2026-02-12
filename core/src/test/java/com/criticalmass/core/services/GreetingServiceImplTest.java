@@ -17,6 +17,6 @@ class GreetingServiceImplTest {
         String message = service.getMessage("description", MAGIC_INTEGER);
 
         assertNotNull(message, "Message should not be null");
-        assertEquals("Hello from AEM Service!", message);
+        assertEquals("Hello description! Your number is 42.", message);
     }
 }
